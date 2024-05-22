@@ -7,11 +7,14 @@ export async function standardErrorApiHandler(error, store) {
             text: error.response.data.message,
         });
     } else if (error.response?.status === 422) {
-        store.state.notify({
-            type: 'error',
-            title: 'Błąd',
-            text: error.response.data.message,
-        });
+        console.log(error.response.data.errors);
+        for (let errorMessage in error.response.data.errors) {
+            store.state.notify({
+                type: 'error',
+                title: 'Błąd',
+                text: error.response.data.errors[errorMessage][0],
+            });
+        }
     } else {
         console.error(error);
         store.state.notify({
