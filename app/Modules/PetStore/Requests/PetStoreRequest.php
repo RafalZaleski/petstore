@@ -26,13 +26,13 @@ class PetStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => ['gt:0'],
+            'id' => ['integer', 'gt:0'],
             'name' => ['required', 'min:1', 'max:255'],
             'category' => ['array:id,name'],
             'photoUrls' => ['required', 'array'],
             'photoUrls.*' => ['required', 'min:1'],
             'tags' => ['array'],
-            'tags.*.id' => ['gt:0'],
+            'tags.*.id' => ['integer', 'gt:0'],
             'tags.*.name' => ['min:1', 'max:255'],
             'status' => [Rule::enum(PetStatusEnum::class)],
         ];

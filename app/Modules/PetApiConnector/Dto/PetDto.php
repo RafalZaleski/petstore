@@ -14,16 +14,15 @@ class PetDto
     private PetCategoryDto $category;
     private string $name;
     private array $photoUrls;
-    // tags nowe dto 
     private array $tags;
     private PetStatusEnum $status;
 
-    public function setDataFromRequest(PetStoreRequest|PetUpdateRequest $request): self
+    public function setDataFromRequest(array $request): self
     {
         $this->setId($request['id'])
             ->setName($request['name'])
-            ->setCategory(new PetCategoryDto($request['category_id'], $request['categoty_name']))
-            ->setStatus($request['status']);
+            ->setCategory(new PetCategoryDto($request['category']['id'], $request['category']['name']))
+            ->setStatus(PetStatusEnum::tryFrom($request['status']));
 
         foreach ($request['photoUrls'] as $photoUrl) {
             $this->addPhotoUrl($photoUrl);
@@ -83,8 +82,8 @@ class PetDto
             'id' => $this->id,
             'name' => $this->name,
             'category' => [
-                'id' => $this->category->id,
-                'name' => $this->category->name,
+                'id' => $this->category->getId(),
+                'name' => $this->category->getName(),
             ],
             'photoUrls' => $this->photoUrls,
             'tags' => $this->getTagsArray(),
@@ -98,8 +97,8 @@ class PetDto
 
         foreach ($this->tags as $tag) {
             $tags[] = [
-                'id' => $tag->id,
-                'name' => $tag->name,
+                'id' => $tag->getId(),
+                'name' => $tag->getName(),
             ];
         }
 

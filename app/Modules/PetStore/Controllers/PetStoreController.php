@@ -9,6 +9,7 @@ use App\Modules\PetApiConnector\Dto\PetDto;
 use App\Modules\PetApiConnector\Services\PetApiConnectorService;
 use App\Modules\PetStore\Requests\PetStoreRequest;
 use App\Modules\PetStore\Requests\PetUpdateRequest;
+use Illuminate\Http\Client\Response;
 
 class PetStoreController extends Controller
 {
@@ -16,12 +17,12 @@ class PetStoreController extends Controller
     {
     }
 
-    public function show(int $id)
+    public function show(int $id): Response
     {
         return $this->petApiConnector->get($id);
     }
 
-    public function store(PetStoreRequest $request)
+    public function store(PetStoreRequest $request): Response
     {
         $data = $request->validated();
         $petDto = new PetDto();
@@ -30,7 +31,7 @@ class PetStoreController extends Controller
         return $this->petApiConnector->store($petDto);
     }
 
-    public function update(PetUpdateRequest $request)
+    public function update(PetUpdateRequest $request): Response
     {
         $data = $request->validated();
         $petDto = new PetDto();
@@ -39,7 +40,7 @@ class PetStoreController extends Controller
         return $this->petApiConnector->store($petDto);
     }
 
-    public function destroy(int $id)
+    public function destroy(int $id): Response
     {
         return $this->petApiConnector->delete($id);
     }
