@@ -12,7 +12,7 @@
                 :loading="store.getters.isLoading"
                 type="button"
                 color="green"
-                >Pobierz wpisane id</v-btn>
+                >Pobierz rekord o wpisanym id</v-btn>
             <v-btn
                 @click="remove()"
                 :loading="store.getters.isLoading"
