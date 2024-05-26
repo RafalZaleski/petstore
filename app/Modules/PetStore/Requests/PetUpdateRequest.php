@@ -26,7 +26,7 @@ class PetUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'id' => ['integer', 'gt:0'],
+            'id' => ['required', 'integer', 'gt:0'],
             'name' => ['required', 'min:1', 'max:255'],
             'category' => ['array:id,name'],
             'category.id' => ['integer', 'gt:0'],

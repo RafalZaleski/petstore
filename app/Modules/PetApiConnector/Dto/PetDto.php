@@ -8,7 +8,7 @@ use App\Modules\PetApiConnector\Enums\PetStatusEnum;
 
 class PetDto
 {
-    private int $id;
+    private ?int $id = null;
     private ?PetCategoryDto $category = null;
     private string $name;
     private array $photoUrls;
@@ -17,9 +17,12 @@ class PetDto
 
     public function setDataFromRequest(array $request): self
     {
-        $this->setId((int)$request['id'])
-            ->setName($request['name'])
+        $this->setName($request['name'])
             ->setStatus(PetStatusEnum::tryFrom($request['status']));
+
+        if (isset($request['id'])) {
+            $this->setId((int)$request['id']);
+        }
 
         if (isset($request['category'])) {
             $this->setCategory(new PetCategoryDto((int)$request['category']['id'], $request['category']['name']));

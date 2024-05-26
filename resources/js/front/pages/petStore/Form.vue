@@ -1,5 +1,5 @@
 <template>
-    <v-sheet>
+    <v-sheet class="w-100 w-sm-50 mx-auto">
         <div>Dodaj tablice</div>
         <v-form @submit.prevent="submit()">
             <v-text-field
@@ -8,7 +8,7 @@
                 :autofocus="true"
                 ></v-text-field>
             <v-btn
-                @click="get()"
+                @click="get(form.id)"
                 :loading="store.getters.isLoading"
                 type="button"
                 color="green"
@@ -110,6 +110,7 @@
     const apiPetStore = new PetStore(store);
 
     const form = ref({ id: 1, name: null, category: { id: null, name: null }, photoUrls: [], tags: [], status: null });
+    const formScoped = { id: null, name: null, category: { id: null, name: null }, photoUrls: [], tags: [], status: null };
     
 
     const rules = [
@@ -128,15 +129,24 @@
             delete(formValues.value.category);
         }
 
-        if (form.value.id > 0) {
+        if (formValues.value.id > 0) {
             apiPetStore.edit(formValues);
         } else {
-            apiPetStore.add(formValues);
+            delete(formValues.value.id);
+            apiPetStore.add(formValues).then(
+                () => {
+                    form.value.id = formValues.value.id;
+                }
+            );
         }
     }
 
-    function get() {
-        apiPetStore.get(form.value.id, form);
+    function get(id) {
+        form.value = { ...formScoped }
+
+        if (id > 0) {    
+            apiPetStore.get(id, form);
+        }
     }
 
     function remove() {
