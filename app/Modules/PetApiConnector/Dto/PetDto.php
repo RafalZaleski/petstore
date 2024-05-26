@@ -5,30 +5,31 @@ declare(strict_types=1);
 namespace App\Modules\PetApiConnector\Dto;
 
 use App\Modules\PetApiConnector\Enums\PetStatusEnum;
-use App\Modules\PetStore\Requests\PetStoreRequest;
-use App\Modules\PetStore\Requests\PetUpdateRequest;
 
 class PetDto
 {
     private int $id;
-    private PetCategoryDto $category;
+    private ?PetCategoryDto $category = null;
     private string $name;
     private array $photoUrls;
-    private array $tags;
+    private ?array $tags = null;
     private PetStatusEnum $status;
 
     public function setDataFromRequest(array $request): self
     {
-        $this->setId($request['id'])
+        $this->setId((int)$request['id'])
             ->setName($request['name'])
-            ->setCategory(new PetCategoryDto($request['category']['id'], $request['category']['name']))
             ->setStatus(PetStatusEnum::tryFrom($request['status']));
+
+        if (isset($request['category'])) {
+            $this->setCategory(new PetCategoryDto((int)$request['category']['id'], $request['category']['name']));
+        }
 
         foreach ($request['photoUrls'] as $photoUrl) {
             $this->addPhotoUrl($photoUrl);
         }
         foreach ($request['tags'] as $tag) {
-            $this->addTag(new PetTagDto($tag['id'], $tag['name']));
+            $this->addTag(new PetTagDto((int)$tag['id'], $tag['name']));
         }
 
         return $this;
@@ -82,8 +83,8 @@ class PetDto
             'id' => $this->id,
             'name' => $this->name,
             'category' => [
-                'id' => $this->category->getId(),
-                'name' => $this->category->getName(),
+                'id' => $this->category?->getId(),
+                'name' => $this->category?->getName(),
             ],
             'photoUrls' => $this->photoUrls,
             'tags' => $this->getTagsArray(),
@@ -95,11 +96,13 @@ class PetDto
     {
         $tags = [];
 
-        foreach ($this->tags as $tag) {
-            $tags[] = [
-                'id' => $tag->getId(),
-                'name' => $tag->getName(),
-            ];
+        if ($this->tags) {
+            foreach ($this->tags as $tag) {
+                $tags[] = [
+                    'id' => $tag->getId(),
+                    'name' => $tag->getName(),
+                ];
+            }
         }
 
         return $tags;

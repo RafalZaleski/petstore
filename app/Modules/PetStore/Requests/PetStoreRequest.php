@@ -29,6 +29,8 @@ class PetStoreRequest extends FormRequest
             'id' => ['integer', 'gt:0'],
             'name' => ['required', 'min:1', 'max:255'],
             'category' => ['array:id,name'],
+            'category.id' => ['integer', 'gt:0'],
+            'category.name' => ['min:1', 'max:255'],
             'photoUrls' => ['required', 'array'],
             'photoUrls.*' => ['required', 'min:1'],
             'tags' => ['array'],

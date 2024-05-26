@@ -32,13 +32,32 @@
                 v-model="form.category.name"
                 label="Nazwa kategorii"
                 ></v-text-field>
-            <v-text-field
-                v-for="(photoUrls, index) in form.photosUrls"
-                v-model="form.photosUrls[index]"
-                label="Url zdjęcia"
-                ></v-text-field>
-            
-            <div v-for="(tag, index) in form.tags">
+            <div class="d-flex ga-2" v-for="(photoUrls, index) in form.photoUrls">
+                <v-text-field
+                    v-model="form.photoUrls[index]"
+                    label="Url zdjęcia"
+                    ></v-text-field>
+                <v-btn 
+                    :disabled="store.getters.isLoading"
+                    @click="deletePhotoUrl(index)"
+                    color="red"
+                    class="ma-1"
+                    >
+                    <span class="mdi mdi-delete"></span>
+                    <v-tooltip activator="parent" location="top" text="Usuń"></v-tooltip>
+                </v-btn>
+            </div>
+            <div v-if="form.photoUrls.length === 0">Brak zdjęć</div>
+            <v-btn
+                :disabled="store.getters.isLoading"
+                @click="addNewPhotoUrl()"
+                color="green"
+                class="ma-1"
+              >
+                Dodaj url zdjęcia
+                <v-tooltip activator="parent" location="top" text="Dodaj"></v-tooltip>
+            </v-btn>
+            <div class="d-flex ga-2" v-for="(tag, index) in form.tags">
                 <v-text-field
                     v-model="form.tags[index].id"
                     label="Id tagu"
@@ -47,8 +66,26 @@
                     v-model="form.tags[index].name"
                     label="Nazwa tagu"
                     ></v-text-field>
+                <v-btn 
+                    :disabled="store.getters.isLoading"
+                    @click="deleteTag(index)"
+                    color="red"
+                    class="ma-1"
+                    >
+                    <span class="mdi mdi-delete"></span>
+                    <v-tooltip activator="parent" location="top" text="Usuń"></v-tooltip>
+                </v-btn>
             </div>
-            
+            <div v-if="form.tags.length === 0">Brak tagów</div>
+            <v-btn
+                :disabled="store.getters.isLoading"
+                @click="addNewTag()"
+                color="green"
+                class="ma-1"
+              >
+                Dodaj tag
+                <v-tooltip activator="parent" location="top" text="Dodaj"></v-tooltip>
+              </v-btn>
             <v-text-field
                 v-model="form.status"
                 label="Status"
@@ -72,7 +109,7 @@
     const store = useStore();
     const apiPetStore = new PetStore(store);
 
-    const form = ref({ id: 1, name: '', category: { id: 0, name: '' }, photosUrls: [], tags: [], status: '' });
+    const form = ref({ id: 1, name: null, category: { id: null, name: null }, photoUrls: [], tags: [], status: null });
     
 
     const rules = [
@@ -84,11 +121,18 @@
     ];
 
     async function submit () {
-    if (form.value.id > 0) {
-        apiPetStore.edit(form);
-    } else {
-        apiPetStore.add(form);
-    }
+        
+        const formValues = { value: { ...form.value }};
+
+        if (formValues.value.category.id === null && formValues.value.category.name === null) {
+            delete(formValues.value.category);
+        }
+
+        if (form.value.id > 0) {
+            apiPetStore.edit(formValues);
+        } else {
+            apiPetStore.add(formValues);
+        }
     }
 
     function get() {
@@ -98,7 +142,21 @@
     function remove() {
         apiPetStore.delete(form.value.id);
     }
-  
-    get();
+
+    function addNewPhotoUrl() {
+        form.value.photoUrls.push('');
+    }
+
+    function deletePhotoUrl(index) {
+        form.value.photoUrls.splice(index, 1);
+    }
+
+    function addNewTag() {
+        form.value.tags.push({ id: 1, name: '' });
+    }
+
+    function deleteTag(index) {
+        form.value.tags.splice(index, 1);
+    }
   
 </script>
